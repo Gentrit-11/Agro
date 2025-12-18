@@ -19,10 +19,6 @@ class ProductsTable extends Component
             ->orderBy('created_at', 'desc')
             ->get();
 
-        if(strlen($this->search)>2){
-            dd("test");
-        }
-
         return view('livewire.products-table', [
             'products' => $products
         ]);
