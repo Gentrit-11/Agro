@@ -2,41 +2,77 @@
 
 <?php $__env->startSection('content'); ?>
 
-<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+    <div class="container-fluid">
+        <div class="row g-3">
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- STOKU -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-success h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-box text-success fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Stoku total</div>
+                            <div class="fs-4 fw-bold"><?php echo e($stok); ?> kg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- STOKU -->
-    <div class="bg-white p-5 rounded shadow border-l-4 border-green-600">
-        <p class="text-sm text-gray-500">Stoku total</p>
-        <h2 class="text-2xl font-bold"><?php echo e($stok); ?> kg</h2>
+            <!-- BORXH FURNITORË -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-danger h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-truck text-danger fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Borxh furnitorë</div>
+                            <div class="fs-4 fw-bold text-danger">
+                                <?php echo e($borxhFurnitore); ?> €
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BORXH KLIENTË -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-warning h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-people text-warning fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Borxh klientë</div>
+                            <div class="fs-4 fw-bold text-warning">
+                                <?php echo e($borxhKliente); ?> €
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHITJE SOT -->
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card border-primary h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-cash-stack text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Shitje sot</div>
+                            <div class="fs-4 fw-bold text-primary">
+                                <?php echo e($shitjeSot); ?> €
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-
-    <!-- BORXH FURNITORË -->
-    <div class="bg-white p-5 rounded shadow border-l-4 border-red-600">
-        <p class="text-sm text-gray-500">Borxh furnitorë</p>
-        <h2 class="text-2xl font-bold text-red-600">
-            <?php echo e($borxhFurnitore); ?> €
-        </h2>
-    </div>
-
-    <!-- BORXH KLIENTË -->
-    <div class="bg-white p-5 rounded shadow border-l-4 border-yellow-500">
-        <p class="text-sm text-gray-500">Borxh klientë</p>
-        <h2 class="text-2xl font-bold text-yellow-600">
-            <?php echo e($borxhKliente); ?> €
-        </h2>
-    </div>
-
-    <!-- SHITJE SOT -->
-    <div class="bg-white p-5 rounded shadow border-l-4 border-blue-600">
-        <p class="text-sm text-gray-500">Shitje sot</p>
-        <h2 class="text-2xl font-bold text-blue-600">
-            <?php echo e($shitjeSot); ?> €
-        </h2>
-    </div>
-
-</div>
 
 <?php $__env->stopSection(); ?>
 

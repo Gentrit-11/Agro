@@ -2,16 +2,17 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>{{ config('app.name') }}</title>
+    <title>{{ config('app.name') }} - Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
 
-    <div class="w-full max-w-md bg-white shadow rounded p-6">
-        {{ $slot }}
-    </div>
+<div class="bg-white p-4 rounded shadow" style="width:100%;max-width:420px">
+    @yield('content')
+</div>
 
 </body>
 </html>

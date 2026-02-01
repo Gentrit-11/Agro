@@ -1,165 +1,203 @@
 <!DOCTYPE html>
 <html lang="sq">
-
 <head>
     <meta charset="UTF-8">
     <title><?php echo e(config('app.name')); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css']); ?>
+    
+    <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('icons/bootstrap-icons.css')); ?>">
+
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
 
 
+    <style>
+        body { font-size: 14px; }
+
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1f2933, #111827);
+            z-index: 1050;
+        }
+        .sidebar-logo {
+    max-width: 100%;
+    height: auto;
+    max-height: 80px;   /* rregullo sipas qejfit */
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+
+        .sidebar a,
+        .sidebar button {
+            color: #d1d5db;
+            text-decoration: none;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar a:hover,
+        .sidebar button:hover {
+            background-color: rgba(255,255,255,.08);
+            border-radius: .375rem;
+            color: #fff;
+        }
+
+        .sidebar .active {
+            background-color: #198754;
+            color: #fff !important;
+        }
+
+        @media (min-width: 992px) {
+            .content-wrapper {
+                margin-left: 260px;
+            }
+        }
+    </style>
 </head>
 
+<body class="bg-light">
 
-<body class="bg-gray-100 text-gray-800">
-
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
     <!-- SIDEBAR -->
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-gray-100
-           transform -translate-x-full lg:translate-x-0
-           transition-transform duration-300 ease-in-out">
-        <div class="p-4 text-xl font-bold border-b border-gray-700">
-            🌱 AgroApp
-        </div>
+    <aside id="sidebar" class="sidebar position-fixed top-0 start-0 d-lg-block d-none text-light">
+        <div class="p-3 border-bottom fw-bold">
+ <img
+        src="<?php echo e(asset('WhatsApp Image 2026-01-13 at 11.35.44.jpeg')); ?>"
+        class="sidebar-logo"
+        alt="Logo"
+    >        </div>
 
-        <nav class="p-4 space-y-1 text-sm">
+        <nav class="p-3 d-flex flex-column gap-1">
 
-            <a href="<?php echo e(route('dashboard')); ?>" class="block px-4 py-2 rounded bg-green-600 font-semibold">
-                Dashboard
+            
+            <a href="<?php echo e(route('dashboard')); ?>" class="px-3 py-2 <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
 
-            <!-- PRODUKTE -->
-            <div>
-                <button onclick="toggleProductsMenu()"
-                    class="w-full flex items-center justify-between px-4 py-2 rounded hover:bg-gray-700">
-                    <span>Produkte</span>
-                    <svg id="productsArrow" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-
-                <!-- NËNMENU -->
-                <div id="productsMenu" class="ml-4 mt-1 space-y-1 hidden">
-                    <a href="<?php echo e(route('products.index')); ?>" class="block px-4 py-2 rounded hover:bg-gray-700">
-                        Shih Produkte
-                    </a>
-
-                    <a href="<?php echo e(route('products.create')); ?>" class="block px-4 py-2 rounded hover:bg-gray-700">
-                        Shto Produkt
-                    </a>
-                </div>
+            
+            <button class="px-3 py-2" onclick="toggleMenu('productsMenu')">
+                <i class="bi bi-box-seam me-2"></i> Produkte
+                <i class="bi bi-chevron-down float-end"></i>
+            </button>
+            <div id="productsMenu" class="ms-3 d-none">
+                <a href="<?php echo e(route('products.index')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-list-ul me-2"></i> Lista
+                </a>
+                <a href="<?php echo e(route('products.create')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-plus-circle me-2"></i> Shto
+                </a>
             </div>
 
-            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">
-                Furnitorë
-            </a>
+            
+            <button class="px-3 py-2" onclick="toggleMenu('suppliersMenu')">
+                <i class="bi bi-truck me-2"></i> Furnitorë
+                <i class="bi bi-chevron-down float-end"></i>
+            </button>
+            <div id="suppliersMenu" class="ms-3 d-none">
+                <a href="<?php echo e(route('suppliers.index')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-list-ul me-2"></i> Lista
+                </a>
+                <a href="<?php echo e(route('suppliers.create')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-plus-circle me-2"></i> Shto
+                </a>
+            </div>
 
-            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">
-                Blerje
-            </a>
+            
+            <button class="px-3 py-2" onclick="toggleMenu('purchasesMenu')">
+                <i class="bi bi-cart-plus me-2"></i> Blerje
+                <i class="bi bi-chevron-down float-end"></i>
+            </button>
+            <div id="purchasesMenu" class="ms-3 d-none">
+                <a href="<?php echo e(route('purchases.index')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-list-ul me-2"></i> Lista
+                </a>
+                <a href="<?php echo e(route('purchases.create')); ?>" class="d-block px-3 py-1">
+                    <i class="bi bi-plus-circle me-2"></i> Shto
+                </a>
+            </div>
 
-            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">
-                Shitje
-            </a>
-            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">
-                Prodhim
-            </a>
+            
+            <span class="px-3 py-2 d-flex align-items-center text-secondary" style="opacity:.5;cursor:default">
+                <i class="bi bi-cash-coin me-2"></i> Shitje
+                <small class="ms-auto badge bg-secondary">Së shpejti</small>
+            </span>
 
-            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">
-                Borxhe
-            </a>
+            <hr class="border-secondary my-2">
 
+            <a href="#" class="px-3 py-2">
+                <i class="bi bi-exclamation-circle me-2"></i> Borxhe
+            </a>
         </nav>
 
-
-        <div class="absolute bottom-0 w-full p-4 border-t border-gray-700 text-sm">
-            👤 <?php echo e(auth()->user()->name); ?>
+        <div class="p-3 border-top position-absolute bottom-0 w-100">
+            <i class="bi bi-person-circle me-2"></i> <?php echo e(auth()->user()->name); ?>
 
         </div>
     </aside>
 
-    <!-- OVERLAY (MOBILE ONLY) -->
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden">
-    </div>
+    <!-- OVERLAY MOBILE -->
+    <div id="overlay"
+         class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none"
+         style="z-index:1040"
+         onclick="toggleSidebar()"></div>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    <!-- CONTENT WRAPPER -->
-    <div class="lg:ml-64 min-h-screen flex flex-col">
+<!-- CONTENT -->
+<div class="content-wrapper min-vh-100 d-flex flex-column">
 
-        <!-- TOP BAR -->
-        <header class="flex items-center justify-between bg-white shadow px-4 py-3">
-
-            <!-- LEFT -->
-            <div class="flex items-center gap-3">
-                <!-- HAMBURGER (MOBILE ONLY) -->
-                <button onclick="toggleSidebar()" class="lg:hidden text-gray-700 text-2xl">
-                    ☰
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+        <header class="bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
                 </button>
-
-                <h1 class="text-lg font-bold text-gray-800">
-                    <?php echo $__env->yieldContent('title', 'Dashboard'); ?>
-                </h1>
+                <h6 class="mb-0 fw-bold"><?php echo $__env->yieldContent('title','Dashboard'); ?></h6>
             </div>
 
-            <!-- RIGHT (PROFILE) -->
-            <div class="relative group">
-                <button class="flex items-center gap-2 focus:outline-none">
-                    <span class="text-sm font-medium text-gray-700">
-                        <?php echo e(auth()->user()->name); ?>
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <?php echo e(auth()->user()->name); ?>
 
-                    </span>
-                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
                 </button>
-
-                <!-- DROPDOWN -->
-                <div
-                    class="absolute right-0 mt-2 w-40 bg-white rounded shadow-md border
-                       hidden group-hover:block z-50">
-                    <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">
-                        Profili
-                    </a>
-
-                    <form method="POST" action="<?php echo e(route('logout')); ?>">
-                        <?php echo csrf_field(); ?>
-                        <button type="submit"
-                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                            Logout
-                        </button>
-                    </form>
-                </div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <form method="POST" action="<?php echo e(route('logout')); ?>">
+                            <?php echo csrf_field(); ?>
+                            <button class="dropdown-item text-danger">Logout</button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-
         </header>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <!-- PAGE CONTENT -->
-        <main class="flex-1 p-4">
-            <?php echo $__env->yieldContent('content'); ?>
-        </main>
+    <main class="flex-grow-1 p-4">
+        <?php echo $__env->yieldContent('content'); ?>
+    </main>
 
-    </div>
+</div>
 
-    <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
+<?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
+<script src="<?php echo e(asset('js/bootstrap.bundle.min.js')); ?>"></script>
 
-        function toggleProductsMenu() {
-            const menu = document.getElementById('productsMenu');
-            const arrow = document.getElementById('productsArrow');
-            menu.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        }
-    </script>
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('d-none');
+        document.getElementById('overlay').classList.toggle('d-none');
+    }
+
+    function toggleMenu(id) {
+        document.getElementById(id).classList.toggle('d-none');
+    }
+</script>
+
 </body>
-
 </html>
 <?php /**PATH C:\Users\yverb\agro-app\resources\views/layouts/app.blade.php ENDPATH**/ ?>

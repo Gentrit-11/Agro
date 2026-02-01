@@ -65,23 +65,9 @@ class ProductController extends Controller
         return redirect()->route('products.index');
     }
 
-    public function destroy(Product $product)
+    public function toggle(Product $product)
     {
-        $product->update(['is_active' => false]);
+        $product->update(['is_active' => !$product->is_active]);
         return back();
     }
-       public function search(Request $request)
-{
-    $q = $request->query('q');
-
-    $products = Product::query()
-        ->when($q, function ($query) use ($q) {
-            $query->where('name', 'like', "%{$q}%")
-                  ->orWhere('description', 'like', "%{$q}%");
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return response()->json($products);
-}
 }
