@@ -39,8 +39,10 @@
                 <tr>
                     <th>#</th>
                     <th>Produkti</th>
-                    <th class="text-end">Sasia</th>
-                    <th class="text-end">Cmimi / Njesi</th>
+                    <th class="text-end">Kg</th>
+                    <th class="text-end">Kuti</th>
+                    <th class="text-end">Kg/Kuti</th>
+                    <th class="text-end">&euro;/Kg</th>
                     <th class="text-end">Totali</th>
                 </tr>
                 </thead>
@@ -50,19 +52,21 @@
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $item->product->name ?? '-' }}</td>
                         <td class="text-end">{{ rtrim(rtrim(number_format($item->quantity_base, 3), '0'), '.') }}</td>
+                        <td class="text-end">{{ $item->package_quantity > 0 ? $item->package_quantity : '-' }}</td>
+                        <td class="text-end">{{ $item->package_quantity > 0 && $item->quantity_base > 0 ? rtrim(rtrim(number_format($item->quantity_base / $item->package_quantity, 3), '0'), '.') : '-' }}</td>
                         <td class="text-end">{{ number_format($item->price_per_base_unit, 2) }} &euro;</td>
                         <td class="text-end">{{ number_format($item->total, 2) }} &euro;</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted">Nuk ka artikuj</td>
+                        <td colspan="7" class="text-center text-muted">Nuk ka artikuj</td>
                     </tr>
                 @endforelse
                 </tbody>
                 @if($purchase->items->isNotEmpty())
                     <tfoot class="table-light">
                     <tr>
-                        <td colspan="4" class="text-end fw-bold">Totali i Blerjes</td>
+                        <td colspan="6" class="text-end fw-bold">Totali i Blerjes</td>
                         <td class="text-end fw-bold">{{ number_format($purchase->total_amount, 2) }} &euro;</td>
                     </tr>
                     </tfoot>
