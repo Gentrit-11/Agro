@@ -4,31 +4,24 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\Computed;
-use App\Models\Supplier;
 use App\Models\Product;
-use App\Models\Purchase;
-use App\Models\PurchaseItem;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use Illuminate\Support\Facades\DB;
 
-class PurchaseForm extends Component
+class SaleForm extends Component
 {
-    public $supplier_id;
-    public $invoice_number;
-    public $purchase_date;
+    public $client_name = '';
+    public $sale_type = 'retail';
+    public $sale_date;
     public $paid_amount = 0;
 
     public $items = [];
 
     public function mount()
     {
-        $this->purchase_date = now()->format('Y-m-d');
+        $this->sale_date = now()->format('Y-m-d');
         $this->items[] = $this->emptyRow();
-    }
-
-    #[Computed]
-    public function suppliers()
-    {
-        return Supplier::where('is_active', true)->get();
     }
 
     #[Computed]
@@ -42,17 +35,7 @@ class PurchaseForm extends Component
     {
         $total = 0;
         foreach ($this->items as $row) {
-            $unit = $row['unit'] ?? 'kg';
-            if ($this->isCope($unit)) {
-                $qtyBase = (float) ($row['quantity_base'] ?? 0);
-            } else {
-                $pkgQty  = (float) ($row['package_quantity'] ?? 0);
-                $basePer = (float) ($row['base_per_package'] ?? 0);
-                $qtyBase = ($pkgQty > 0 && $basePer > 0)
-                    ? $pkgQty * $basePer
-                    : (float) ($row['quantity_base'] ?? 0);
-            }
-            $total += $qtyBase * (float) ($row['price_per_base_unit'] ?? 0);
+            $total += $this->rowTotal($row);
         }
         return round($total, 2);
     }
@@ -68,15 +51,30 @@ class PurchaseForm extends Component
         return str_starts_with(mb_strtolower($unit), 'cop');
     }
 
+    protected function rowTotal(array $row): float
+    {
+        $unit = $row['unit'] ?? 'kg';
+        if ($this->isCope($unit)) {
+            $qty = (float) ($row['quantity'] ?? 0);
+        } else {
+            $pkgQty  = (float) ($row['package_quantity'] ?? 0);
+            $basePer = (float) ($row['base_per_package'] ?? 0);
+            $qty = ($pkgQty > 0 && $basePer > 0)
+                ? $pkgQty * $basePer
+                : (float) ($row['quantity'] ?? 0);
+        }
+        return $qty * (float) ($row['price'] ?? 0);
+    }
+
     protected function emptyRow()
     {
         return [
             'product_id' => null,
             'unit' => 'kg',
-            'quantity_base' => 0,
+            'quantity' => 0,
             'package_quantity' => 0,
             'base_per_package' => 0,
-            'price_per_base_unit' => 0,
+            'price' => 0,
             'total' => 0,
         ];
     }
@@ -110,19 +108,20 @@ class PurchaseForm extends Component
     public function save()
     {
         $rules = [
-            'supplier_id' => 'required|exists:suppliers,id',
-            'purchase_date' => 'required|date',
+            'client_name' => 'nullable|string|max:255',
+            'sale_type' => 'required|in:wholesale,retail',
+            'sale_date' => 'required|date',
             'paid_amount' => 'nullable|numeric|min:0',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.price_per_base_unit' => 'required|numeric|min:0.01',
+            'items.*.price' => 'required|numeric|min:0.01',
         ];
 
         foreach ($this->items as $i => $row) {
             $unit = $row['unit'] ?? 'kg';
             if ($this->isCope($unit)) {
-                $rules["items.{$i}.quantity_base"] = 'required|integer|min:1';
+                $rules["items.{$i}.quantity"] = 'required|integer|min:1';
             } else {
-                $rules["items.{$i}.quantity_base"] = 'required|numeric|min:0.01';
+                $rules["items.{$i}.quantity"] = 'required|numeric|min:0.01';
             }
         }
 
@@ -131,13 +130,14 @@ class PurchaseForm extends Component
         DB::transaction(function () {
             $paidAmount = (float) ($this->paid_amount ?? 0);
 
-            $purchase = Purchase::create([
-                'supplier_id' => $this->supplier_id,
-                'purchase_date' => $this->purchase_date,
-                'invoice_number' => $this->invoice_number,
+            $sale = Sale::create([
+                'client_name' => $this->client_name ?: null,
+                'sale_type' => $this->sale_type,
+                'sale_date' => $this->sale_date,
                 'total_amount' => 0,
                 'paid_amount' => 0,
-                'debt_amount' => 0,
+                'remaining_amount' => 0,
+                'status' => 'unpaid',
             ]);
 
             $grandTotal = 0;
@@ -147,47 +147,57 @@ class PurchaseForm extends Component
                 $cope = $this->isCope($unit);
 
                 if ($cope) {
-                    $qtyBase = (int) $row['quantity_base'];
+                    $qty = (int) $row['quantity'];
                 } else {
                     $pkgQty  = (float) ($row['package_quantity'] ?? 0);
                     $basePer = (float) ($row['base_per_package'] ?? 0);
-                    $qtyBase = ($pkgQty > 0 && $basePer > 0)
+                    $qty = ($pkgQty > 0 && $basePer > 0)
                         ? $pkgQty * $basePer
-                        : (float) $row['quantity_base'];
+                        : (float) $row['quantity'];
                 }
 
-                $rowTotal = $qtyBase * (float) $row['price_per_base_unit'];
+                $rowTotal = $qty * (float) $row['price'];
 
-                PurchaseItem::create([
-                    'purchase_id' => $purchase->id,
+                SaleItem::create([
+                    'sale_id' => $sale->id,
                     'product_id' => $row['product_id'],
-                    'quantity_base' => $qtyBase,
+                    'quantity' => $qty,
                     'package_quantity' => $cope ? 0 : (int) ($row['package_quantity'] ?? 0),
                     'base_per_package' => $cope ? 0 : (float) ($row['base_per_package'] ?? 0),
-                    'price_per_base_unit' => $row['price_per_base_unit'],
+                    'price' => $row['price'],
                     'total' => $rowTotal,
                 ]);
 
                 Product::where('id', $row['product_id'])
-                    ->increment('stock', $qtyBase);
+                    ->decrement('stock', $qty);
 
                 $grandTotal += $rowTotal;
             }
 
-            $debtAmount = max(0, $grandTotal - $paidAmount);
+            $remaining = max(0, $grandTotal - $paidAmount);
+            $actualPaid = min($paidAmount, $grandTotal);
 
-            $purchase->update([
+            if ($remaining <= 0) {
+                $status = 'paid';
+            } elseif ($actualPaid > 0) {
+                $status = 'partial';
+            } else {
+                $status = 'unpaid';
+            }
+
+            $sale->update([
                 'total_amount' => $grandTotal,
-                'paid_amount' => min($paidAmount, $grandTotal),
-                'debt_amount' => $debtAmount,
+                'paid_amount' => $actualPaid,
+                'remaining_amount' => $remaining,
+                'status' => $status,
             ]);
         });
 
-        return redirect()->route('purchases.index');
+        return redirect()->route('sales.index');
     }
 
     public function render()
     {
-        return view('livewire.purchase-form');
+        return view('livewire.sale-form');
     }
 }

@@ -7,7 +7,7 @@
                 <input type="text"
                        wire:model.live="search"
                        class="form-control"
-                       placeholder="🔍 Kërko sipas furnitorit">
+                       placeholder="Kerko sipas furnitorit">
             </div>
 
             <div class="col-md-8 text-end">
@@ -23,7 +23,9 @@
                 <th>#</th>
                 <th>Furnitori</th>
                 <th>Data</th>
-                <th>Totali (€)</th>
+                <th>Totali (&euro;)</th>
+                <th>Borxhi (&euro;)</th>
+                <th>Statusi</th>
                 <th></th>
             </tr>
             </thead>
@@ -34,7 +36,17 @@
                     <td>{{ $p->id }}</td>
                     <td>{{ $p->supplier->company_name ?? '-' }}</td>
                     <td>{{ $p->purchase_date }}</td>
-                    <td>{{ number_format($p->total_amount, 2) }} €</td>
+                    <td>{{ number_format($p->total_amount, 2) }} &euro;</td>
+                    <td>{{ number_format($p->debt_amount, 2) }} &euro;</td>
+                    <td>
+                        @if($p->payment_status === 'paid')
+                            <span class="badge bg-success">Paguar</span>
+                        @elseif($p->payment_status === 'partial')
+                            <span class="badge bg-warning text-dark">Pjeserisht</span>
+                        @else
+                            <span class="badge bg-danger">Pa paguar</span>
+                        @endif
+                    </td>
                     <td class="text-center">
                         <a href="{{ route('purchases.show', $p) }}" class="btn btn-sm btn-outline-secondary">
                             Shiko
@@ -43,7 +55,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center text-muted">
+                    <td colspan="7" class="text-center text-muted">
                         Nuk ka blerje
                     </td>
                 </tr>

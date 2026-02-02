@@ -3,23 +3,21 @@
 
         <div class="row mb-3">
             <div class="col-md-4">
-                <label class="form-label">Furnitori</label>
-                <select wire:model="supplier_id" class="form-select">
-                    <option value="">-- zgjedh --</option>
-                    @foreach($this->suppliers as $s)
-                        <option value="{{ $s->id }}">{{ $s->company_name }}</option>
-                    @endforeach
+                <label class="form-label">Klienti</label>
+                <input type="text" wire:model="client_name" class="form-control" placeholder="Emri i klientit (opsionale)">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Lloji i Shitjes</label>
+                <select wire:model.live="sale_type" class="form-select">
+                    <option value="retail">Pakice</option>
+                    <option value="wholesale">Shumice</option>
                 </select>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label">Data</label>
-                <input type="date" wire:model="purchase_date" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Fatura</label>
-                <input type="text" wire:model="invoice_number" class="form-control">
+                <input type="date" wire:model="sale_date" class="form-control">
             </div>
         </div>
 
@@ -56,9 +54,9 @@
 
                     <td>
                         <input type="number" step="{{ $isCope ? '1' : '0.01' }}"
-                               wire:model.live="items.{{ $i }}.quantity_base"
+                               wire:model.live="items.{{ $i }}.quantity"
                                class="form-control"
-                               placeholder="{{ $isCope ? 'Cop\u00eb' : 'Kg' }}">
+                               placeholder="{{ $isCope ? $unit : 'Kg' }}">
                     </td>
 
                     <td>
@@ -83,7 +81,7 @@
 
                     <td>
                         <input type="number" step="0.01"
-                               wire:model.live="items.{{ $i }}.price_per_base_unit"
+                               wire:model.live="items.{{ $i }}.price"
                                class="form-control"
                                placeholder="&euro;/{{ $isCope ? $unit : 'kg' }}">
                     </td>
@@ -91,15 +89,15 @@
                     <td>
                         @php
                             if ($isCope) {
-                                $qtyBase = (float) ($row['quantity_base'] ?? 0);
+                                $qty = (float) ($row['quantity'] ?? 0);
                             } else {
                                 $pkgQty  = (float) ($row['package_quantity'] ?? 0);
                                 $basePer = (float) ($row['base_per_package'] ?? 0);
-                                $qtyBase = ($pkgQty > 0 && $basePer > 0)
+                                $qty = ($pkgQty > 0 && $basePer > 0)
                                     ? $pkgQty * $basePer
-                                    : (float) ($row['quantity_base'] ?? 0);
+                                    : (float) ($row['quantity'] ?? 0);
                             }
-                            $rowTotal = $qtyBase * (float) ($row['price_per_base_unit'] ?? 0);
+                            $rowTotal = $qty * (float) ($row['price'] ?? 0);
                         @endphp
                         {{ number_format($rowTotal, 2) }} &euro;
                     </td>
@@ -143,7 +141,7 @@
 
         <div class="text-end">
             <button class="btn btn-success">
-                Ruaj Blerjen
+                Ruaj Shitjen
             </button>
         </div>
     </form>

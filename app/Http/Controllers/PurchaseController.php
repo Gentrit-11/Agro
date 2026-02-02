@@ -25,7 +25,7 @@
 
         public function show(Purchase $purchase)
         {
-            $purchase->load('supplier', 'items.product');
+            $purchase->load('supplier', 'items.product', 'payments');
 
             return view('purchases.show', compact('purchase'));
         }

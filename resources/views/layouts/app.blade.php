@@ -121,17 +121,34 @@
                 </a>
             </div>
 
-            {{-- SHITJE (coming soon) --}}
-            <span class="px-3 py-2 d-flex align-items-center text-secondary" style="opacity:.5;cursor:default">
+            {{-- SHITJE --}}
+            <button class="px-3 py-2" onclick="toggleMenu('salesMenu')">
                 <i class="bi bi-cash-coin me-2"></i> Shitje
-                <small class="ms-auto badge bg-secondary">Së shpejti</small>
-            </span>
+                <i class="bi bi-chevron-down float-end"></i>
+            </button>
+            <div id="salesMenu" class="ms-3 {{ request()->routeIs('sales.*') ? '' : 'd-none' }}">
+                <a href="{{ route('sales.index') }}" class="d-block px-3 py-1 {{ request()->routeIs('sales.index') ? 'active' : '' }}">
+                    <i class="bi bi-list-ul me-2"></i> Lista
+                </a>
+                <a href="{{ route('sales.create') }}" class="d-block px-3 py-1 {{ request()->routeIs('sales.create') ? 'active' : '' }}">
+                    <i class="bi bi-plus-circle me-2"></i> Shto
+                </a>
+            </div>
 
             <hr class="border-secondary my-2">
 
-            <a href="#" class="px-3 py-2">
+            <button class="px-3 py-2" onclick="toggleMenu('debtsMenu')">
                 <i class="bi bi-exclamation-circle me-2"></i> Borxhe
-            </a>
+                <i class="bi bi-chevron-down float-end"></i>
+            </button>
+            <div id="debtsMenu" class="ms-3 {{ request()->routeIs('debts.*') || request()->routeIs('client-debts.*') ? '' : 'd-none' }}">
+                <a href="{{ route('debts.index') }}" class="d-block px-3 py-1 {{ request()->routeIs('debts.*') ? 'active' : '' }}">
+                    <i class="bi bi-truck me-2"></i> Borxhe Furnitoresh
+                </a>
+                <a href="{{ route('client-debts.index') }}" class="d-block px-3 py-1 {{ request()->routeIs('client-debts.*') ? 'active' : '' }}">
+                    <i class="bi bi-people me-2"></i> Borxhi i Klienteve
+                </a>
+            </div>
         </nav>
 
         <div class="p-3 border-top position-absolute bottom-0 w-100">
@@ -174,7 +191,7 @@
         </header>
     @endauth
 
-    <main class="flex-grow-1 p-4">
+    <main class="flex-grov-1 p-4">
         @yield('content')
     </main>
 

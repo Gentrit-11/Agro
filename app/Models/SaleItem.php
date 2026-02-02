@@ -10,6 +10,8 @@ class SaleItem extends Model
         'sale_id',
         'product_id',
         'quantity',
+        'package_quantity',
+        'base_per_package',
         'price',
         'total',
     ];
@@ -17,7 +19,9 @@ class SaleItem extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'decimal:2',
+            'quantity' => 'decimal:3',
+            'package_quantity' => 'integer',
+            'base_per_package' => 'decimal:3',
             'price' => 'decimal:2',
             'total' => 'decimal:2',
         ];

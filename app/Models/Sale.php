@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Sale extends Model
 {
     protected $fillable = [
+        'client_name',
         'sale_type',
         'total_amount',
         'paid_amount',
@@ -28,5 +30,23 @@ class Sale extends Model
     public function items()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(SalePayment::class);
+    }
+
+    protected function paymentStatus(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->remaining_amount <= 0) {
+                return 'paid';
+            }
+            if ($this->paid_amount > 0) {
+                return 'partial';
+            }
+            return 'unpaid';
+        });
     }
 }

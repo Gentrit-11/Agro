@@ -12,7 +12,7 @@ class DashboardController extends Controller
     {
         return view('dashboard', [
             'stok' => Product::where('is_active', true)->sum('stock'),
-            'borxhFurnitore' => Purchase::sum('total_amount'),
+            'borxhFurnitore' => Purchase::sum('debt_amount'),
             'borxhKliente' => Sale::where('status', '!=', 'paid')->sum('remaining_amount'),
             'shitjeSot' => Sale::whereDate('sale_date', today())->sum('total_amount'),
         ]);

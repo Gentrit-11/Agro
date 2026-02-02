@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Supplier extends Model
 {
@@ -34,5 +35,9 @@ class Supplier extends Model
         return $this->hasMany(Purchase::class);
     }
 
+    protected function totalDebt(): Attribute
+    {
+        return Attribute::get(fn () => $this->purchases()->sum('debt_amount'));
+    }
 }
 
